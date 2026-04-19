@@ -10,39 +10,39 @@ Aplikasi web manajemen stok barang gudang berbasis **CodeIgniter 4** + **MySQL**
 
 | No | Nama Lengkap | NIM | Peran |
 |----|--------------|-----|-------|
-| 1 | [Nama Anggota 1] | [NIM] | Ketua / Backend Developer |
-| 2 | [Nama Anggota 2] | [NIM] | Backend Developer |
-| 3 | [Nama Anggota 3] | [NIM] | Frontend Developer |
-| 4 | [Nama Anggota 4] | [NIM] | Database & Dokumentasi |
+| 1 | Yoseph Martua Leonard Sianipar | 312410437 | Backend Developer|
+| 2 | Noval Suprayoga | 312410305 | Backend Developer & Dokumentasi|
+| 3 | Amanda Ramadani | 312410352 | Frontend Developer & Database |
+| 4 | Ardito Sayudha | 312410627 | 
 
 ---
 
 ## 📋 Pembagian Tugas
 
-### 👤 Anggota 1 — Ketua / Backend Developer
+### 👤 Yoseph Martua Leonard Sianipar — Backend Developer
 - Setup project CodeIgniter 4 (struktur folder, konfigurasi awal)
 - Konfigurasi database MySQL (`Database.php`, `.env`)
 - Membuat sistem autentikasi: Login, Logout, Session
 - Implementasi `AuthFilter` untuk proteksi halaman
 - Integrasi dan testing keseluruhan aplikasi
 
-### 👤 Anggota 2 — Backend Developer
+### 👤 Noval Suprayoga — Backend Developer & Dokumentasi
 - Membuat `BarangModel` (CRUD, validasi kode unik)
 - Membuat `BarangController` (index, create, store, edit, update, delete)
 - Implementasi logika validasi form barang
 - Konfigurasi Routes untuk semua endpoint CRUD Barang
+- Membuat README, laporan, dan dokumentasi proyek
 
-### 👤 Anggota 3 — Frontend Developer
+### 👤 Amanda Ramadani  — Frontend Developer
 - Membuat layout reusable (`header.php`, `footer.php`, sidebar navigasi)
 - Membuat semua tampilan View (login, barang, transaksi, dashboard)
 - Desain UI/UX: CSS styling, badge status stok, tabel responsif
 - Implementasi info stok real-time saat pilih barang (JavaScript)
-
-### 👤 Anggota 4 — Database & Dokumentasi
 - Perancangan skema database (ERD, tabel admin/barang/transaksi)
 - Membuat `TransaksiModel` (JOIN query, generate kode otomatis)
 - Membuat `TransaksiController` (logika update & rollback stok otomatis)
-- Membuat README, laporan, dan dokumentasi proyek
+
+### 👤 Ardito Sayudha
 
 ---
 
@@ -159,15 +159,6 @@ php spark serve
 ```
 http://localhost:8080
 ```
-
----
-
-## 🔑 Akun Default
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin123` |
 
 ---
 
