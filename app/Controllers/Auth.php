@@ -16,7 +16,7 @@ class Auth extends Controller
     }
 
     // Tampilkan halaman login
-    public function index(): string
+    public function index(): string|\CodeIgniter\HTTP\RedirectResponse
     {
         // Kalau sudah login, redirect ke dashboard
         if (session()->get('logged_in')) {
