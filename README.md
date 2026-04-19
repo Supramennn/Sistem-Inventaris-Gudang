@@ -1,61 +1,232 @@
-# CodeIgniter 4 Framework
+# 🏭 Sistem Inventaris Gudang
 
-## What is CodeIgniter?
+Aplikasi web manajemen stok barang gudang berbasis **CodeIgniter 4** + **MySQL** menggunakan arsitektur **MVC** dan paradigma **OOP**.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+> Proyek UTS — Mata Kuliah Pemrograman Web 2
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+---
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## 👥 Anggota Kelompok
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+| No | Nama Lengkap | NIM | Peran |
+|----|--------------|-----|-------|
+| 1 | [Nama Anggota 1] | [NIM] | Ketua / Backend Developer |
+| 2 | [Nama Anggota 2] | [NIM] | Backend Developer |
+| 3 | [Nama Anggota 3] | [NIM] | Frontend Developer |
+| 4 | [Nama Anggota 4] | [NIM] | Database & Dokumentasi |
 
-## Important Change with index.php
+---
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+## 📋 Pembagian Tugas
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+### 👤 Anggota 1 — Ketua / Backend Developer
+- Setup project CodeIgniter 4 (struktur folder, konfigurasi awal)
+- Konfigurasi database MySQL (`Database.php`, `.env`)
+- Membuat sistem autentikasi: Login, Logout, Session
+- Implementasi `AuthFilter` untuk proteksi halaman
+- Integrasi dan testing keseluruhan aplikasi
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### 👤 Anggota 2 — Backend Developer
+- Membuat `BarangModel` (CRUD, validasi kode unik)
+- Membuat `BarangController` (index, create, store, edit, update, delete)
+- Implementasi logika validasi form barang
+- Konfigurasi Routes untuk semua endpoint CRUD Barang
 
-## Repository Management
+### 👤 Anggota 3 — Frontend Developer
+- Membuat layout reusable (`header.php`, `footer.php`, sidebar navigasi)
+- Membuat semua tampilan View (login, barang, transaksi, dashboard)
+- Desain UI/UX: CSS styling, badge status stok, tabel responsif
+- Implementasi info stok real-time saat pilih barang (JavaScript)
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+### 👤 Anggota 4 — Database & Dokumentasi
+- Perancangan skema database (ERD, tabel admin/barang/transaksi)
+- Membuat `TransaksiModel` (JOIN query, generate kode otomatis)
+- Membuat `TransaksiController` (logika update & rollback stok otomatis)
+- Membuat README, laporan, dan dokumentasi proyek
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+---
 
-## Contributing
+## ✨ Fitur Aplikasi
 
-We welcome contributions from the community.
+- 🔐 **Login & Logout** — Autentikasi admin dengan password terenkripsi bcrypt
+- 📦 **Manajemen Barang** — CRUD data barang dengan validasi kode unik
+- 🔄 **Transaksi Barang** — Pencatatan barang masuk/keluar + update stok otomatis
+- ↩️ **Rollback Stok** — Stok otomatis dikembalikan saat transaksi diedit/dihapus
+- 📊 **Dashboard** — Statistik stok, monitoring barang kritis, transaksi terbaru
+- 🛡️ **Auth Guard** — Semua halaman terlindungi `AuthFilter`
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
+---
 
-## Server Requirements
+## 🛠️ Teknologi
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+| Komponen | Teknologi |
+|----------|-----------|
+| Backend Framework | CodeIgniter 4 (PHP 8.x) |
+| Database | MySQL 5.7+ |
+| Frontend | HTML5, CSS3, JavaScript |
+| Server Lokal | XAMPP + `php spark serve` |
+| Editor | Visual Studio Code |
+| Paradigma | OOP + MVC |
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+---
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+## 📁 Struktur Folder
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+```
+app/
+├── Config/
+│   ├── Database.php          ← konfigurasi koneksi MySQL
+│   ├── Filters.php           ← registrasi AuthFilter
+│   └── Routes.php            ← definisi semua route
+├── Controllers/
+│   ├── Auth.php              ← Login & Logout
+│   ├── Dashboard.php         ← halaman dashboard statistik
+│   ├── Barang.php            ← CRUD data barang
+│   └── Transaksi.php         ← CRUD transaksi masuk/keluar
+├── Filters/
+│   └── AuthFilter.php        ← proteksi halaman dari akses tanpa login
+├── Models/
+│   ├── AdminModel.php        ← model autentikasi
+│   ├── BarangModel.php       ← model data barang
+│   └── TransaksiModel.php    ← model transaksi + JOIN query
+└── Views/
+    ├── auth/
+    │   └── login.php
+    ├── layout/
+    │   ├── header.php        ← sidebar + CSS global
+    │   └── footer.php
+    ├── barang/
+    │   ├── index.php
+    │   ├── create.php
+    │   └── edit.php
+    ├── transaksi/
+    │   ├── index.php
+    │   ├── create.php
+    │   └── edit.php
+    └── dashboard/
+        └── index.php
+```
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+---
+
+## ⚙️ Cara Instalasi & Menjalankan
+
+### Prasyarat
+- PHP 8.0+
+- MySQL 5.7+ (via XAMPP)
+- Composer
+
+### Langkah-langkah
+
+**1. Clone / ekstrak proyek**
+```bash
+cd C:/xampp/htdocs
+# ekstrak folder proyek di sini
+```
+
+**2. Install dependency**
+```bash
+composer install
+```
+
+**3. Salin file environment**
+```bash
+cp env .env
+```
+
+**4. Edit file `.env` — sesuaikan konfigurasi database**
+```env
+CI_ENVIRONMENT = development
+
+database.default.hostname = localhost
+database.default.database = inventaris_gudang
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+```
+
+**5. Import database**
+- Buka `http://localhost/phpmyadmin`
+- Buat database baru: `inventaris_gudang`
+- Import file `inventaris_gudang.sql`
+
+**6. Jalankan server**
+```bash
+php spark serve
+```
+
+**7. Buka browser**
+```
+http://localhost:8080
+```
+
+---
+
+## 🔑 Akun Default
+
+| Field | Value |
+|-------|-------|
+| Username | `admin` |
+| Password | `admin123` |
+
+---
+
+## 🗺️ Alur Aplikasi
+
+| Route | Halaman | Deskripsi |
+|-------|---------|-----------|
+| `GET /login` | Login | Form autentikasi admin |
+| `POST /login` | - | Proses verifikasi login |
+| `GET /dashboard` | Dashboard | Statistik stok & transaksi terbaru |
+| `GET /barang` | Data Barang | Daftar semua barang + status stok |
+| `GET /barang/create` | Tambah Barang | Form input barang baru |
+| `GET /barang/edit/:id` | Edit Barang | Form edit data barang |
+| `GET /transaksi` | Transaksi | Riwayat semua transaksi |
+| `GET /transaksi/create` | Tambah Transaksi | Form transaksi masuk/keluar |
+| `GET /transaksi/edit/:id` | Edit Transaksi | Edit + recalculate stok otomatis |
+| `GET /logout` | - | Destroy session, redirect ke login |
+
+---
+
+## 🗄️ Skema Database
+
+```sql
+-- Tabel admin (autentikasi)
+CREATE TABLE admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama_admin VARCHAR(100),
+    username   VARCHAR(50) UNIQUE NOT NULL,
+    password   VARCHAR(255) NOT NULL
+);
+
+-- Tabel barang (master data)
+CREATE TABLE barang (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    kode_barang  VARCHAR(20) UNIQUE NOT NULL,
+    nama_barang  VARCHAR(100) NOT NULL,
+    satuan       VARCHAR(20),
+    stok         INT DEFAULT 0,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel transaksi
+CREATE TABLE transaksi (
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    kode_transaksi   VARCHAR(20) UNIQUE NOT NULL,
+    barang_id        INT NOT NULL,
+    jenis            ENUM('masuk','keluar') NOT NULL,
+    jumlah           INT NOT NULL,
+    keterangan       TEXT,
+    tanggal          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (barang_id) REFERENCES barang(id)
+);
+```
+
+---
+
+## 📌 Catatan
+
+- Stok barang **otomatis terupdate** setiap ada transaksi masuk/keluar
+- Saat transaksi **dihapus atau diedit**, stok akan **otomatis dikembalikan** (rollback)
+- Barang dengan stok `≤ 10` akan ditampilkan sebagai **stok kritis** di dashboard
+- Semua halaman memerlukan **login terlebih dahulu** sebelum bisa diakses
