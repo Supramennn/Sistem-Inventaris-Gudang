@@ -1,0 +1,63 @@
+@startuml UseCase_Inventory_Gudang
+
+title Use Case Diagram Sistem Inventory Gudang
+
+skinparam backgroundColor #FFFFFF
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  BorderThickness 1.5
+  FontSize 11
+  FontColor #000000
+}
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  FontSize 12
+  FontStyle bold
+  FontColor #000000
+}
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  BorderThickness 1.5
+  FontSize 12
+  FontStyle bold
+  FontColor #000000
+}
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.2
+
+left to right direction
+
+' ── AKTOR ──
+actor "Admin" as Admin
+actor "Owner" as Owner
+
+' ── SYSTEM BOUNDARY ──
+rectangle "Sistem Inventory Gudang" {
+  usecase "Kelola Data Master\nBarang"  as UC1
+  usecase "Kelola Data Barang\nMasuk"   as UC2
+  usecase "Kelola Data Barang\nKeluar"  as UC3
+  usecase "Kelola Stok Barang"          as UC4
+  usecase "Laporan"                     as UC5
+  usecase "Kelola Akun"                 as UC6
+}
+
+' ── ASOSIASI: Admin (kiri) ──
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+
+' ── ASOSIASI: Owner (kanan) ──
+Owner --> UC5
+Owner --> UC6
+
+' ── RELASI <<include>> ──
+UC2 .down.> UC4 : <<include>>
+UC3 .down.> UC4 : <<include>>
+
+@enduml

@@ -2,157 +2,140 @@
 
 namespace App\Controllers;
 
-use App\Models\TransaksiModel;
 use App\Models\BarangModel;
-use CodeIgniter\Controller;
+use App\Models\TransaksiDetailModel;
+use App\Models\TransaksiModel;
+use App\Services\TransaksiService;
+use Throwable;
 
-class Transaksi extends Controller
+class Transaksi extends BaseController
 {
     protected TransaksiModel $transaksiModel;
-    protected BarangModel    $barangModel;
+    protected TransaksiDetailModel $detailModel;
+    protected BarangModel $barangModel;
+    protected TransaksiService $transaksiService;
 
     public function __construct()
     {
-        $this->transaksiModel = new TransaksiModel();
-        $this->barangModel    = new BarangModel();
-        helper(['form', 'url']);
+        $this->transaksiModel   = new TransaksiModel();
+        $this->detailModel      = new TransaksiDetailModel();
+        $this->barangModel      = new BarangModel();
+        $this->transaksiService = new TransaksiService();
     }
 
-    // READ
     public function index(): string
     {
-        $data = [
-            'title'      => 'Data Transaksi',
-            'transaksi'  => $this->transaksiModel->getAllWithBarang(),
-        ];
-        return view('transaksi/index', $data);
+        $transaksi = $this->transaksiModel->getAllWithTotals();
+
+        return view('transaksi/index', [
+            'title'              => 'Data Transaksi',
+            'transaksi'          => $transaksi,
+            'detailsByTransaksi' => $this->detailModel->getGroupedByTransaksiIds(array_column($transaksi, 'id')),
+        ]);
     }
 
-    // CREATE - form
     public function create(): string
     {
-        $data = [
+        return view('transaksi/create', [
             'title'  => 'Tambah Transaksi',
-            'barang' => $this->barangModel->findAll(),
+            'barang' => $this->barangModel->orderBy('nama_barang', 'ASC')->findAll(),
             'kode'   => $this->transaksiModel->generateKode(),
-        ];
-        return view('transaksi/create', $data);
+        ]);
     }
 
-    // CREATE - proses simpan
     public function store(): \CodeIgniter\HTTP\RedirectResponse
     {
-        $barangId = (int) $this->request->getPost('barang_id');
-        $jenis    = $this->request->getPost('jenis');
-        $jumlah   = (int) $this->request->getPost('jumlah');
-
-        // Validasi stok cukup saat keluar
-        if ($jenis === 'keluar') {
-            $barang = $this->barangModel->find($barangId);
-            if ($barang['stok'] < $jumlah) {
-                return redirect()->back()->withInput()
-                    ->with('error', "Stok tidak cukup! Stok tersedia: {$barang['stok']} {$barang['satuan']}");
-            }
+        if (! $this->validate($this->rules())) {
+            return redirect()->back()->withInput()
+                ->with('errors', $this->validator->getErrors());
         }
 
-        // Simpan transaksi
-        $this->transaksiModel->insert([
-            'kode_transaksi' => $this->request->getPost('kode_transaksi'),
-            'barang_id'      => $barangId,
-            'jenis'          => $jenis,
-            'jumlah'         => $jumlah,
-            'keterangan'     => $this->request->getPost('keterangan'),
-            'tanggal'        => $this->request->getPost('tanggal'),
-        ]);
-
-        // Update stok otomatis
-        $this->updateStok($barangId, $jenis, $jumlah);
-
-        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil disimpan!');
-    }
-
-    // UPDATE - form
-    public function edit(int $id): string
-    {
-        $data = [
-            'title'      => 'Edit Transaksi',
-            'transaksi'  => $this->transaksiModel->find($id),
-            'barang'     => $this->barangModel->findAll(),
-        ];
-        return view('transaksi/edit', $data);
-    }
-
-    // UPDATE - proses
-    public function update(int $id): \CodeIgniter\HTTP\RedirectResponse
-    {
-        $lama     = $this->transaksiModel->find($id);
-        $barangId = (int) $this->request->getPost('barang_id');
-        $jenis    = $this->request->getPost('jenis');
-        $jumlah   = (int) $this->request->getPost('jumlah');
-
-        // Balikkan efek transaksi lama ke stok
-        $this->rollbackStok($lama['barang_id'], $lama['jenis'], $lama['jumlah']);
-
-        // Validasi stok cukup untuk transaksi baru
-        if ($jenis === 'keluar') {
-            $barang = $this->barangModel->find($barangId);
-            if ($barang['stok'] < $jumlah) {
-                // Kembalikan stok lama karena gagal
-                $this->updateStok($lama['barang_id'], $lama['jenis'], $lama['jumlah']);
-                return redirect()->back()->withInput()
-                    ->with('error', "Stok tidak cukup! Stok tersedia: {$barang['stok']} {$barang['satuan']}");
-            }
+        try {
+            $this->transaksiService->create($this->headerPayload(), $this->detailPayload());
+        } catch (Throwable $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
 
-        // Update transaksi
-        $this->transaksiModel->update($id, [
-            'barang_id'  => $barangId,
-            'jenis'      => $jenis,
-            'jumlah'     => $jumlah,
-            'keterangan' => $this->request->getPost('keterangan'),
-            'tanggal'    => $this->request->getPost('tanggal'),
-        ]);
-
-        // Terapkan efek stok baru
-        $this->updateStok($barangId, $jenis, $jumlah);
-
-        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil diupdate!');
+        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil disimpan.');
     }
 
-    // DELETE
-    public function delete(int $id): \CodeIgniter\HTTP\RedirectResponse
+    public function edit(int $id): string|\CodeIgniter\HTTP\RedirectResponse
     {
         $transaksi = $this->transaksiModel->find($id);
 
-        // Balikkan efek stok sebelum hapus
-        $this->rollbackStok($transaksi['barang_id'], $transaksi['jenis'], $transaksi['jumlah']);
+        if (! $transaksi) {
+            return redirect()->to('/transaksi')->with('error', 'Transaksi tidak ditemukan.');
+        }
 
-        $this->transaksiModel->delete($id);
-        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil dihapus!');
+        return view('transaksi/edit', [
+            'title'     => 'Edit Transaksi',
+            'transaksi' => $transaksi,
+            'detail'    => $this->transaksiService->getItems($id, $transaksi),
+            'barang'    => $this->barangModel->orderBy('nama_barang', 'ASC')->findAll(),
+        ]);
     }
 
-    // ─── Helper Methods ───────────────────────────────────────
-
-    /**
-     * Terapkan perubahan stok sesuai jenis transaksi
-     */
-    private function updateStok(int $barangId, string $jenis, int $jumlah): void
+    public function update(int $id): \CodeIgniter\HTTP\RedirectResponse
     {
-        $barang = $this->barangModel->find($barangId);
-        $stokBaru = $jenis === 'masuk'
-            ? $barang['stok'] + $jumlah
-            : $barang['stok'] - $jumlah;
+        if (! $this->validate($this->rules())) {
+            return redirect()->back()->withInput()
+                ->with('errors', $this->validator->getErrors());
+        }
 
-        $this->barangModel->update($barangId, ['stok' => max(0, $stokBaru)]);
+        try {
+            $this->transaksiService->update($id, $this->headerPayload(), $this->detailPayload());
+        } catch (Throwable $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+
+        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil diperbarui.');
     }
 
-    /**
-     * Balikkan efek transaksi ke stok (kebalikan dari updateStok)
-     */
-    private function rollbackStok(int $barangId, string $jenis, int $jumlah): void
+    public function delete(int $id): \CodeIgniter\HTTP\RedirectResponse
     {
-        // Kebalikan: masuk → kurangi, keluar → tambah
-        $kebalikan = $jenis === 'masuk' ? 'keluar' : 'masuk';
-        $this->updateStok($barangId, $kebalikan, $jumlah);
+        try {
+            $this->transaksiService->delete($id);
+        } catch (Throwable $e) {
+            return redirect()->to('/transaksi')->with('error', $e->getMessage());
+        }
+
+        return redirect()->to('/transaksi')->with('success', 'Transaksi berhasil dihapus.');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'kode_transaksi' => 'required|max_length[30]',
+            'jenis'          => 'required|in_list[masuk,keluar]',
+            'tanggal'        => 'required|valid_date[Y-m-d]',
+            'barang_id'      => 'required',
+            'jumlah'         => 'required',
+        ];
+    }
+
+    private function headerPayload(): array
+    {
+        return [
+            'kode_transaksi' => trim((string) $this->request->getPost('kode_transaksi')),
+            'jenis'          => (string) $this->request->getPost('jenis'),
+            'tanggal'        => (string) $this->request->getPost('tanggal'),
+            'keterangan'     => $this->request->getPost('keterangan'),
+        ];
+    }
+
+    private function detailPayload(): array
+    {
+        $barangIds = (array) $this->request->getPost('barang_id');
+        $jumlahs   = (array) $this->request->getPost('jumlah');
+        $items     = [];
+
+        foreach ($barangIds as $index => $barangId) {
+            $items[] = [
+                'barang_id' => $barangId,
+                'jumlah'    => $jumlahs[$index] ?? 0,
+            ];
+        }
+
+        return $items;
     }
 }

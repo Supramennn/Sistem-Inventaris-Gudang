@@ -1,11 +1,11 @@
 <?= $this->include('layout/header') ?>
 
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-    <p style="color:#64748b; font-size:0.9rem;">Total: <strong><?= count($barang) ?></strong> barang</p>
-    <a href="/barang/create" class="btn btn-primary">+ Tambah Barang</a>
+<div class="page-actions">
+    <p class="muted">Total: <strong><?= count($barang) ?></strong> barang</p>
+    <a href="<?= site_url('barang/create') ?>" class="btn btn-primary">Tambah Barang</a>
 </div>
 
-<div class="card">
+<div class="card table-responsive">
     <table>
         <thead>
             <tr>
@@ -18,30 +18,34 @@
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($barang)): ?>
-                <tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:2rem;">Belum ada data barang.</td></tr>
-            <?php else: ?>
-                <?php foreach ($barang as $i => $b): ?>
+            <?php if ($barang === []): ?>
                 <tr>
-                    <td><?= $i + 1 ?></td>
-                    <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px;"><?= esc($b['kode_barang']) ?></code></td>
-                    <td><?= esc($b['nama_barang']) ?></td>
-                    <td><?= esc($b['satuan']) ?></td>
+                    <td colspan="6" class="empty-state">Belum ada data barang.</td>
+                </tr>
+            <?php endif; ?>
+
+            <?php foreach ($barang as $index => $item): ?>
+                <?php
+                    $stok  = (int) $item['stok'];
+                    $class = $stok > 10 ? 'badge-green' : ($stok > 0 ? 'badge-yellow' : 'badge-red');
+                ?>
+                <tr>
+                    <td><?= $index + 1 ?></td>
+                    <td><code><?= esc($item['kode_barang']) ?></code></td>
+                    <td><?= esc($item['nama_barang']) ?></td>
+                    <td><?= esc($item['satuan']) ?></td>
+                    <td><span class="badge <?= $class ?>"><?= number_format($stok) ?></span></td>
                     <td>
-                        <?php
-                            $stok = $b['stok'];
-                            $class = $stok > 10 ? 'badge-green' : ($stok > 0 ? 'badge-yellow' : 'badge-red');
-                        ?>
-                        <span class="badge <?= $class ?>"><?= $stok ?></span>
-                    </td>
-                    <td style="display:flex; gap:0.4rem;">
-                        <a href="/barang/edit/<?= $b['id'] ?>" class="btn btn-warning">✏️ Edit</a>
-                        <a href="/barang/delete/<?= $b['id'] ?>" class="btn btn-danger"
-                           onclick="return confirm('Hapus barang ini?')">🗑️ Hapus</a>
+                        <div class="actions">
+                            <a href="<?= site_url('barang/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="<?= site_url('barang/delete/' . $item['id']) ?>" method="post" class="inline-form" onsubmit="return confirm('Hapus barang ini?')">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </div>
