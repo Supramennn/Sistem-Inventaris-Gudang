@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
+<<<<<<< HEAD
 -- Generation Time: May 24, 2026 at 08:23 PM
+=======
+-- Generation Time: Apr 19, 2026 at 01:45 PM
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +28,29 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+<<<<<<< HEAD
+=======
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `id` int(11) NOT NULL,
+  `nama_admin` varchar(100) DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin`
+--
+
+INSERT INTO `admin` (`id`, `nama_admin`, `username`, `password`) VALUES
+(1, 'Super Admin', 'admin', '$2y$10$8i0UUU/0DJrzLlzWQ6In4uszoxwtryCEbJoNfUyOUWHvuchRuhQAa');
+
+-- --------------------------------------------------------
+
+--
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 -- Table structure for table `barang`
 --
 
@@ -31,6 +58,7 @@ CREATE TABLE `barang` (
   `id` int(11) NOT NULL,
   `kode_barang` varchar(20) NOT NULL,
   `nama_barang` varchar(100) NOT NULL,
+<<<<<<< HEAD
   `deskripsi` text DEFAULT NULL,
   `stok` int(11) DEFAULT 0,
   `stok_minimum` int(11) DEFAULT 10,
@@ -95,6 +123,10 @@ CREATE TABLE `supplier` (
   `alamat` text DEFAULT NULL,
   `telepon` varchar(20) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
+=======
+  `satuan` varchar(20) DEFAULT NULL,
+  `stok` int(11) DEFAULT 0,
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -106,6 +138,7 @@ CREATE TABLE `supplier` (
 
 CREATE TABLE `transaksi` (
   `id` int(11) NOT NULL,
+<<<<<<< HEAD
   `kode_transaksi` varchar(30) NOT NULL,
   `barang_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -113,10 +146,17 @@ CREATE TABLE `transaksi` (
   `jumlah` int(11) NOT NULL,
   `harga_satuan` decimal(15,2) DEFAULT 0.00,
   `total_harga` decimal(15,2) DEFAULT 0.00,
+=======
+  `kode_transaksi` varchar(20) NOT NULL,
+  `barang_id` int(11) NOT NULL,
+  `jenis` enum('masuk','keluar') NOT NULL,
+  `jumlah` int(11) NOT NULL,
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
   `keterangan` text DEFAULT NULL,
   `tanggal` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+<<<<<<< HEAD
 -- --------------------------------------------------------
 
 --
@@ -140,15 +180,28 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`id`, `nama`, `username`, `password`, `role`, `is_active`, `created_at`) VALUES
 (1, 'Admin', 'Admin', 'Admin123', 'admin', 1, '2026-05-24 01:04:38');
 
+=======
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 --
 -- Indexes for dumped tables
 --
 
 --
+<<<<<<< HEAD
+=======
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 -- Indexes for table `barang`
 --
 ALTER TABLE `barang`
   ADD PRIMARY KEY (`id`),
+<<<<<<< HEAD
   ADD UNIQUE KEY `kode_barang` (`kode_barang`),
   ADD KEY `kategori_id` (`kategori_id`),
   ADD KEY `satuan_id` (`satuan_id`),
@@ -180,6 +233,9 @@ ALTER TABLE `satuan`
 ALTER TABLE `supplier`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `kode_supplier` (`kode_supplier`);
+=======
+  ADD UNIQUE KEY `kode_barang` (`kode_barang`);
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 
 --
 -- Indexes for table `transaksi`
@@ -187,6 +243,7 @@ ALTER TABLE `supplier`
 ALTER TABLE `transaksi`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `kode_transaksi` (`kode_transaksi`),
+<<<<<<< HEAD
   ADD KEY `barang_id` (`barang_id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -196,12 +253,16 @@ ALTER TABLE `transaksi`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
+=======
+  ADD KEY `barang_id` (`barang_id`);
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
+<<<<<<< HEAD
 -- AUTO_INCREMENT for table `barang`
 --
 ALTER TABLE `barang`
@@ -230,17 +291,32 @@ ALTER TABLE `satuan`
 --
 ALTER TABLE `supplier`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+=======
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `barang`
+--
+ALTER TABLE `barang`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 
 --
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
+<<<<<<< HEAD
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
+=======
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
@@ -248,6 +324,7 @@ ALTER TABLE `user`
 --
 
 --
+<<<<<<< HEAD
 -- Constraints for table `barang`
 --
 ALTER TABLE `barang`
@@ -262,6 +339,12 @@ ALTER TABLE `barang`
 ALTER TABLE `transaksi`
   ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`),
   ADD CONSTRAINT `transaksi_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+=======
+-- Constraints for table `transaksi`
+--
+ALTER TABLE `transaksi`
+  ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`barang_id`) REFERENCES `barang` (`id`);
+>>>>>>> d2637b52aa9022e46c8e75f095ca7d2f070fea2f
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
