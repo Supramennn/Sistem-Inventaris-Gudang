@@ -1,8 +1,15 @@
 <?= $this->include('layout/header') ?>
 
+<?php
+    $role = (string) session()->get('role');
+    $canManageTransaksi = in_array($role, ['admin', 'operator'], true);
+?>
+
 <div class="page-actions">
     <p class="muted">Total: <strong><?= count($transaksi) ?></strong> transaksi</p>
-    <a href="<?= site_url('transaksi/create') ?>" class="btn btn-primary">Tambah Transaksi</a>
+    <?php if ($canManageTransaksi): ?>
+        <a href="<?= site_url('transaksi/create') ?>" class="btn btn-primary">Tambah Transaksi</a>
+    <?php endif; ?>
 </div>
 
 <div class="card table-responsive">
@@ -16,13 +23,15 @@
                 <th>Total Jumlah</th>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
-                <th>Aksi</th>
+                <?php if ($canManageTransaksi): ?>
+                    <th>Aksi</th>
+                <?php endif; ?>
             </tr>
         </thead>
         <tbody>
             <?php if ($transaksi === []): ?>
                 <tr>
-                    <td colspan="8" class="empty-state">Belum ada transaksi.</td>
+                    <td colspan="<?= $canManageTransaksi ? 8 : 7 ?>" class="empty-state">Belum ada transaksi.</td>
                 </tr>
             <?php endif; ?>
 
@@ -53,15 +62,17 @@
                     <td><?= number_format((int) $item['total_jumlah']) ?></td>
                     <td><?= esc(date('d M Y', strtotime($item['tanggal']))) ?></td>
                     <td><?= esc($item['keterangan'] ?: '-') ?></td>
-                    <td>
-                        <div class="actions">
-                            <a href="<?= site_url('transaksi/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
-                            <form action="<?= site_url('transaksi/delete/' . $item['id']) ?>" method="post" class="inline-form" onsubmit="return confirm('Hapus transaksi ini? Stok akan dikembalikan.')">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                            </form>
-                        </div>
-                    </td>
+                    <?php if ($canManageTransaksi): ?>
+                        <td>
+                            <div class="actions">
+                                <a href="<?= site_url('transaksi/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="<?= site_url('transaksi/delete/' . $item['id']) ?>" method="post" class="inline-form" onsubmit="return confirm('Hapus transaksi ini? Stok akan dikembalikan.')">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
         </tbody>

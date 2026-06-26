@@ -26,7 +26,7 @@
     <section class="card">
         <div class="section-title">
             <h2>Stok Kritis</h2>
-            <span class="badge badge-red">Stok <= 10</span>
+            <span class="badge badge-red">Di bawah minimum</span>
         </div>
 
         <?php if ($barangKritis === []): ?>
@@ -36,7 +36,8 @@
                 <?php foreach ($barangKritis as $barang): ?>
                     <?php
                         $stok = (int) $barang['stok'];
-                        $pct  = min(100, max(0, ($stok / 10) * 100));
+                        $minimum = max(1, (int) ($barang['stok_minimum'] ?? 10));
+                        $pct  = min(100, max(0, ($stok / $minimum) * 100));
                     ?>
                     <div class="critical-item">
                         <div class="critical-item-row">

@@ -9,7 +9,7 @@ class TransaksiDetailModel extends Model
     protected $table         = 'transaksi_detail';
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
-    protected $allowedFields = ['transaksi_id', 'barang_id', 'jumlah'];
+    protected $allowedFields = ['transaksi_id', 'barang_id', 'jumlah', 'harga_satuan', 'total_harga'];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -23,8 +23,10 @@ class TransaksiDetailModel extends Model
     public function getByTransaksiId(int $transaksiId): array
     {
         return $this->db->table($this->table . ' td')
-            ->select('td.*, b.kode_barang, b.nama_barang, b.satuan')
+            ->select('td.*, b.kode_barang, b.nama_barang')
+            ->select("COALESCE(NULLIF(s.singkatan, ''), s.nama_satuan) AS satuan", false)
             ->join('barang b', 'b.id = td.barang_id')
+            ->join('satuan s', 's.id = b.satuan_id', 'left')
             ->where('td.transaksi_id', $transaksiId)
             ->orderBy('td.id', 'ASC')
             ->get()
@@ -40,8 +42,10 @@ class TransaksiDetailModel extends Model
         }
 
         $rows = $this->db->table($this->table . ' td')
-            ->select('td.*, b.kode_barang, b.nama_barang, b.satuan')
+            ->select('td.*, b.kode_barang, b.nama_barang')
+            ->select("COALESCE(NULLIF(s.singkatan, ''), s.nama_satuan) AS satuan", false)
             ->join('barang b', 'b.id = td.barang_id')
+            ->join('satuan s', 's.id = b.satuan_id', 'left')
             ->whereIn('td.transaksi_id', $transaksiIds)
             ->orderBy('td.id', 'ASC')
             ->get()

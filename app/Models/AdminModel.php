@@ -6,17 +6,15 @@ use CodeIgniter\Model;
 
 class AdminModel extends Model
 {
-    protected $table      = 'admin';
-    protected $primaryKey = 'id';
-    protected $allowedFields = ['nama_admin', 'username', 'password'];
+    protected $table         = 'user';
+    protected $primaryKey    = 'id';
+    protected $returnType    = 'array';
+    protected $allowedFields = ['nama', 'username', 'password', 'role', 'is_active'];
 
-    /**
-     * Cari admin berdasarkan username
-     * @param string $username
-     * @return array|null
-     */
     public function findByUsername(string $username): array|null
     {
-        return $this->where('username', $username)->first();
+        return $this->where('username', $username)
+            ->where('is_active', 1)
+            ->first();
     }
 }

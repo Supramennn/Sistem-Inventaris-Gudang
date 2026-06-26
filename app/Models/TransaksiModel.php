@@ -14,8 +14,11 @@ class TransaksiModel extends Model
         'jenis',
         'keterangan',
         'tanggal',
+        'user_id',
         'barang_id',
         'jumlah',
+        'harga_satuan',
+        'total_harga',
     ];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';

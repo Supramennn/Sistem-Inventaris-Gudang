@@ -38,7 +38,7 @@ class Transaksi extends BaseController
     {
         return view('transaksi/create', [
             'title'  => 'Tambah Transaksi',
-            'barang' => $this->barangModel->orderBy('nama_barang', 'ASC')->findAll(),
+            'barang' => $this->barangModel->getAllWithRelations(),
             'kode'   => $this->transaksiModel->generateKode(),
         ]);
     }
@@ -51,7 +51,10 @@ class Transaksi extends BaseController
         }
 
         try {
-            $this->transaksiService->create($this->headerPayload(), $this->detailPayload());
+            $header = $this->headerPayload();
+            $header['kode_transaksi'] = $this->transaksiModel->generateKode();
+
+            $this->transaksiService->create($header, $this->detailPayload());
         } catch (Throwable $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
@@ -71,7 +74,7 @@ class Transaksi extends BaseController
             'title'     => 'Edit Transaksi',
             'transaksi' => $transaksi,
             'detail'    => $this->transaksiService->getItems($id, $transaksi),
-            'barang'    => $this->barangModel->orderBy('nama_barang', 'ASC')->findAll(),
+            'barang'    => $this->barangModel->getAllWithRelations(),
         ]);
     }
 
@@ -117,6 +120,7 @@ class Transaksi extends BaseController
     {
         return [
             'kode_transaksi' => trim((string) $this->request->getPost('kode_transaksi')),
+            'user_id'        => (int) session()->get('user_id'),
             'jenis'          => (string) $this->request->getPost('jenis'),
             'tanggal'        => (string) $this->request->getPost('tanggal'),
             'keterangan'     => $this->request->getPost('keterangan'),

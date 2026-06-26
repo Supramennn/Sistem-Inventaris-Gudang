@@ -32,18 +32,20 @@ class Auth extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        $username = (string) $this->request->getPost('username');
+        $username = trim((string) $this->request->getPost('username'));
         $password = (string) $this->request->getPost('password');
         $admin    = $this->adminModel->findByUsername($username);
 
-        if ($admin && password_verify($password, $admin['password'])) {
+        if ($admin && $this->passwordIsValid($password, $admin)) {
             session()->set([
                 'logged_in'  => true,
                 'admin_id'   => $admin['id'],
-                'nama_admin' => $admin['nama_admin'],
+                'user_id'    => $admin['id'],
+                'nama_admin' => $admin['nama'],
+                'role'       => $admin['role'],
             ]);
 
-            return redirect()->to('/dashboard')->with('success', 'Selamat datang, ' . $admin['nama_admin']);
+            return redirect()->to('/dashboard')->with('success', 'Selamat datang, ' . $admin['nama']);
         }
 
         return redirect()->back()->withInput()->with('error', 'Username atau password salah.');
@@ -54,5 +56,30 @@ class Auth extends BaseController
         session()->destroy();
 
         return redirect()->to('/login')->with('success', 'Berhasil logout.');
+    }
+
+    private function passwordIsValid(string $password, array $admin): bool
+    {
+        $storedPassword = (string) $admin['password'];
+
+        if (password_verify($password, $storedPassword)) {
+            if (password_needs_rehash($storedPassword, PASSWORD_DEFAULT)) {
+                $this->adminModel->update($admin['id'], [
+                    'password' => password_hash($password, PASSWORD_DEFAULT),
+                ]);
+            }
+
+            return true;
+        }
+
+        if (hash_equals($storedPassword, $password)) {
+            $this->adminModel->update($admin['id'], [
+                'password' => password_hash($password, PASSWORD_DEFAULT),
+            ]);
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -30,7 +30,7 @@ class Dashboard extends BaseController
             'totalStok'        => $db->table('barang')->selectSum('stok')->get()->getRow()->stok ?? 0,
             'totalMasuk'       => $this->transaksiModel->countByJenis('masuk'),
             'totalKeluar'      => $this->transaksiModel->countByJenis('keluar'),
-            'barangKritis'     => $this->barangModel->where('stok <=', 10)->orderBy('stok', 'ASC')->findAll(),
+            'barangKritis'     => $this->barangModel->getCriticalStock(),
             'transaksiTerbaru' => $transaksiTerbaru,
             'detailTerbaru'    => $this->detailModel->getGroupedByTransaksiIds(array_column($transaksiTerbaru, 'id')),
         ]);

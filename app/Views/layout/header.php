@@ -1,4 +1,7 @@
-<?php $uri = service('uri')->getSegment(1); ?>
+<?php
+    $uri = service('uri')->getSegment(1);
+    $role = (string) session()->get('role');
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -14,6 +17,9 @@
         <nav class="sidebar-nav" aria-label="Menu utama">
             <a href="<?= site_url('dashboard') ?>" class="<?= $uri === 'dashboard' || $uri === '' ? 'active' : '' ?>">Dashboard</a>
             <a href="<?= site_url('barang') ?>" class="<?= $uri === 'barang' ? 'active' : '' ?>">Data Barang</a>
+            <?php if ($role === 'admin'): ?>
+                <a href="<?= site_url('master-data') ?>" class="<?= $uri === 'master-data' ? 'active' : '' ?>">Master Data</a>
+            <?php endif; ?>
             <a href="<?= site_url('transaksi') ?>" class="<?= $uri === 'transaksi' ? 'active' : '' ?>">Transaksi</a>
         </nav>
         <a href="<?= site_url('logout') ?>" class="logout-btn">Logout</a>
@@ -22,7 +28,7 @@
     <main class="main">
         <header class="topbar">
             <h1><?= esc($title ?? '') ?></h1>
-            <span class="topbar-user"><?= esc(session()->get('nama_admin') ?? 'Admin') ?></span>
+            <span class="topbar-user"><?= esc(session()->get('nama_admin') ?? 'Admin') ?><?= $role ? ' - ' . esc(ucfirst($role)) : '' ?></span>
         </header>
 
         <?php if (session()->getFlashdata('success')): ?>

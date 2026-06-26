@@ -29,6 +29,7 @@ class TransaksiService
     public function create(array $header, array $items): int
     {
         $items = $this->normalizeItems($items);
+        $header = $this->normalizeHeader($header);
 
         $this->db->transBegin();
 
@@ -60,6 +61,7 @@ class TransaksiService
     public function update(int $transaksiId, array $header, array $items): void
     {
         $items     = $this->normalizeItems($items);
+        $header    = $this->normalizeHeader($header);
         $transaksi = $this->transaksiModel->find($transaksiId);
 
         if (! $transaksi) {
@@ -178,7 +180,7 @@ class TransaksiService
                     'Stok %s tidak cukup. Tersedia: %s %s.',
                     $barang['nama_barang'],
                     $barang['stok'],
-                    $barang['satuan']
+                    'unit'
                 ));
             }
         }
@@ -187,10 +189,13 @@ class TransaksiService
     private function insertDetails(int $transaksiId, array $items): void
     {
         foreach ($items as $item) {
+            $hargaSatuan = $this->getHargaSatuan($item['barang_id']);
             $saved = $this->detailModel->insert([
                 'transaksi_id' => $transaksiId,
                 'barang_id'    => $item['barang_id'],
                 'jumlah'       => $item['jumlah'],
+                'harga_satuan' => $hargaSatuan,
+                'total_harga'  => $hargaSatuan * $item['jumlah'],
             ]);
 
             if (! $saved) {
@@ -248,7 +253,42 @@ class TransaksiService
             $header['jumlah'] = array_sum(array_column($items, 'jumlah'));
         }
 
+        if ($this->db->fieldExists('harga_satuan', 'transaksi')) {
+            $header['harga_satuan'] = $this->getHargaSatuan($firstItem['barang_id']);
+        }
+
+        if ($this->db->fieldExists('total_harga', 'transaksi')) {
+            $header['total_harga'] = $this->calculateTotalHarga($items);
+        }
+
         return $header;
+    }
+
+    private function normalizeHeader(array $header): array
+    {
+        if (empty($header['user_id'])) {
+            $header['user_id'] = (int) session()->get('user_id') ?: 1;
+        }
+
+        return $header;
+    }
+
+    private function getHargaSatuan(int $barangId): float
+    {
+        $barang = $this->barangModel->find($barangId);
+
+        return (float) ($barang['harga'] ?? 0);
+    }
+
+    private function calculateTotalHarga(array $items): float
+    {
+        $total = 0;
+
+        foreach ($items as $item) {
+            $total += $this->getHargaSatuan($item['barang_id']) * $item['jumlah'];
+        }
+
+        return $total;
     }
 
     private function finishTransaction(): void
